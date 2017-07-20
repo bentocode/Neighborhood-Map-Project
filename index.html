@@ -2,151 +2,31 @@
 <html>
 <head>
 	<title>Neighborhood Map Project</title>
-
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<script type="text/javascript" src="js/map.js"></script>
 </head>
 <body>
 	<div class="container">
-		<div class="options-box">
-			<h1>Find Your New NYC Home</h1>
-			<div>
+
+		<div class= "row">
+
+		<div id="map" class="col-sm-12 col-md-8"></div>
+
+		<div class="options-box col-sm-12 col-md-4">
+			<h1>Places to Go in Bellevue Washington</h1>
+			<div id="buttons">
 				<input id="show-listings" type="button" value="Show Listings">
 				<input id="hide-listings" type="button" value="Hide Listings">
 			</div>
 		</div>
+
+		</div>
 	</div>
-	<div id="map"></div>
 
-	
-
-	<script>
-		var map;
-		// Create a blank array for the listing markers.
-		var markers = [];
-		var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-		var labelIndex = 0;
-
-
-		function initMap() {
-
-		// Add a styles array to use with the map
-		// This style is 'Bright & Bubbly' by Paulo Avila from SnazzyMaps.com
-
-		var styles = [{"featureType":"water","stylers":[{"color":"#19a0d8"}]},{"featureType":"administrative","elementType":"labels.text.stroke","stylers":[{"color":"#ffffff"},{"weight":6}]},{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#e85113"}]},{"featureType":"road.highway","elementType":"geometry.stroke","stylers":[{"color":"#efe9e4"},{"lightness":-40}]},{"featureType":"road.arterial","elementType":"geometry.stroke","stylers":[{"color":"#efe9e4"},{"lightness":-20}]},{"featureType":"road","elementType":"labels.text.stroke","stylers":[{"lightness":100}]},{"featureType":"road","elementType":"labels.text.fill","stylers":[{"lightness":-100}]},{"featureType":"road.highway","elementType":"labels.icon"},{"featureType":"landscape","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"landscape","stylers":[{"lightness":20},{"color":"#efe9e4"}]},{"featureType":"landscape.man_made","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels.text.stroke","stylers":[{"lightness":100}]},{"featureType":"water","elementType":"labels.text.fill","stylers":[{"lightness":-100}]},{"featureType":"poi","elementType":"labels.text.fill","stylers":[{"hue":"#11ff00"}]},{"featureType":"poi","elementType":"labels.text.stroke","stylers":[{"lightness":100}]},{"featureType":"poi","elementType":"labels.icon","stylers":[{"hue":"#4cff00"},{"saturation":58}]},{"featureType":"poi","elementType":"geometry","stylers":[{"visibility":"on"},{"color":"#f0e4d3"}]},{"featureType":"road.highway","elementType":"geometry.fill","stylers":[{"color":"#efe9e4"},{"lightness":-25}]},{"featureType":"road.arterial","elementType":"geometry.fill","stylers":[{"color":"#efe9e4"},{"lightness":-10}]},{"featureType":"poi","elementType":"labels","stylers":[{"visibility":"simplified"}]}]
-		// Constructor creates a new map - only center and zoom are required
-		map = new google.maps.Map(document.getElementById('map'), {
-			center: {lat: 40.7413549, lng: -73.9980244},
-			zoom: 13,
-			styles: styles,
-			mapTypeControl: false
-		});
-
-		// These are real estate listings that will be shown to the user.
-		// Normally these would be in a database see Google Fusion Tables
-		var locations = [
-			{title: 'Park Ave Penthouse', location: {lat: 40.7713024, 
-				lng: -73.9632393}},
-			{title: 'Chelsea Loft', location: {lat: 40.7444883, 
-				lng: -73.9949465}},
-			{title: 'Union Square Open Floor Plan', location: {lat: 40.7347062, lng: -73.9895759}},
-			{title: 'East Village Hip Studio', location: {lat: 40.728177, 
-				lng: -73.984377}}
-		];
-
-		var largeInfoWindow = new google.maps.InfoWindow();
-
-		// Use the location array to create an array of markers
-		for (var i = 0; i < locations.length; i++) {
-			var position = locations[i].location;
-			var title = locations[i].title;
-			// Create a marker on the map for each location
-			var marker = new google.maps.Marker({
-				position: position,
-				title: title,
-				animation: google.maps.Animation.DROP,
-				id: i,
-				label: labels[labelIndex++ % labels.length]
-			});
-			// Push each marker to the markers array
-			markers.push(marker);
-			// Create an onClick event to open an infowindow at each marker
-			marker.addListener('click', function() {
-				populateInfoWindow(this, largeInfoWindow);
-			});
-
-		};	
-
-		document.getElementById('show-listings').addEventListener('click', showListings);
-		document.getElementById('hide-listings').addEventListener('click',  hideListings);
-	}
-
-	// This function populates the infoWindow when the marker is clicked
-	// Only one infoWindow is allowed at one time
-	// The infoWindow populates based on the markers position
-
-	function populateInfoWindow(marker, infowindow) {
-		// Check to make sure the infowindow is not already open on this marker
-		if (infowindow.marker != marker) {
-			// Clear content to allow streetview to load
-			infowindow.setContent('');
-			infowindow.marker = marker;
-
-			// infowindow.open(map, marker);
-			// Clear the marker property if the infowindow is closed
-			infowindow.addListener('closeclick', function() {
-				infowindow.marker = null;
-			});
-			var streetViewService = new google.maps.StreetViewService();
-			var radius = 50;
-			// In case the status is OK, compute position and heading
-			// Then get panorama and set options
-			function getStreetView(data, status) {
-				if (status == google.maps.StreetViewStatus.OK) {
-					var nearSteetViewLocation = data.location.latLng;
-					var heading = google.maps.geometry.spherical.computeHeading(nearSteetViewLocation, marker.position);
-						infowindow.setContent('<div>'+ marker.title + '</div><div id="pano"></div>');
-						var panoramaOptions = {
-							position: nearSteetViewLocation,
-							pov: {
-								heading: heading,
-								pitch: 30
-							}
-
-						};
-					var panorama = new google.maps.StreetViewPanorama(
-						document.getElementById('pano'), panoramaOptions);
-				} else {
-					infowindow.setContent('<div>' + marker.title + '</div>' + '<div>No Steet View Found</div>');
-					}
-				}
-					// Use streetview service to get closest image within 50 meters
-					streetViewService.getPanoramaByLocation(marker.position, radius, getStreetView);
-					// Open the infowindow on the correct marker
-					infowindow.open(map, marker);
-				}
-			}
-
-	// This function will loop through the markers array and display them all
-	function showListings() {
-		var bounds = new google.maps.LatLngBounds();
-		// Extend the boundaries for the map for each marker and display the 
-		// marker
-		for (var i = 0; i < markers.length; i++) {
-			markers[i].setMap(map);
-			bounds.extend(markers[i].position);
-		}
-		// Tell the map to fit itself to the bounds defined by the markers
-		map.fitBounds(bounds);
-	};
-
-	function hideListings() {
-		for (var i = 0; i < markers.length; i++) {
-			markers[i].setMap(null);
-		}
-	};
-
-	</script>
-
+	</div>
 	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC9UFSUq84AgVnd4knKEyhl9Wq8BEJk2NE&libraries=geometry&v=3&callback=initMap"></script>
 
 
