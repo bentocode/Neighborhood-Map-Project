@@ -1,0 +1,35 @@
+html,
+body {
+	font-family: Arial, sans-serif;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+}
+
+
+.list-box {
+	background: #fff;
+	border: 1px solid #999;
+	border-radius: 10px;
+	height: 60vh;
+	padding: 10px 10px 30px 10px;
+
+}
+
+td {
+	font-size: 16px;
+	text-align: center;
+	border: 3px solid #000;
+}
+
+table {
+	width: 100%;
+}
+
+tbody {
+	background-color: yellow;
+}
+
+#header-title {
+	font-size: 30px;
+}
